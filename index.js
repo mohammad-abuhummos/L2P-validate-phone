@@ -6,8 +6,33 @@ const express = require("express");
 const axios = require("axios");
 const admin = require("firebase-admin");
 
-// Initialize Firebase Admin SDK
-const serviceAccount = require("./serviceAccountKey.json");
+// Initialize Firebase Admin SDK using environment variables
+const serviceAccount = {
+  type: process.env.FIREBASE_TYPE,
+  project_id: process.env.FIREBASE_PROJECT_ID,
+  private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+  private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+  client_email: process.env.FIREBASE_CLIENT_EMAIL,
+  client_id: process.env.FIREBASE_CLIENT_ID,
+  auth_uri: process.env.FIREBASE_AUTH_URI,
+  token_uri: process.env.FIREBASE_TOKEN_URI,
+  auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+  client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
+  universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN,
+};
+
+// Validate Firebase configuration
+if (
+  !serviceAccount.project_id ||
+  !serviceAccount.private_key ||
+  !serviceAccount.client_email
+) {
+  console.error(
+    "Error: Missing Firebase configuration in environment variables."
+  );
+  process.exit(1);
+}
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -91,7 +116,6 @@ app.listen(PORT, () => {
 // Setup:
 // 1. Run `npm init -y`.
 // 2. Install dependencies: `npm install express axios dotenv firebase-admin`.
-// 3. Download your Firebase service account JSON and save as `serviceAccountKey.json`.
-// 4. Create a .env file:
-//    IPQS_API_KEY=your_ipqs_api_key_here
-// 5. Start server: `node index.js`.
+// 3. Configure your .env file with Firebase service account credentials and IPQS API key.
+//    See .env file for required environment variables.
+// 4. Start server: `node index.js`.
