@@ -54,4 +54,4 @@ Thumbs.db
 *.temp
 
 # Service account keys (sensitive)
-serviceAccountKey.json
+# serviceAccountKey.json
