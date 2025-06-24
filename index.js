@@ -80,13 +80,20 @@ app.post("/validate-phone", async (req, res) => {
     const response = await axios.get(url, { params });
     const data = response.data;
 
-    // Determine if the lead is bad quality
-    const badQuality =
-      data.leaked_phone === true ||
-      data.risky_phone === true ||
-      (data.fraud_score_phone || 0) > 0 ||
-      data.valid_phone === false ||
+    // Determine if the lead is good quality
+    const goodQuality =
+      data.leaked_phone === false &&
+      data.risky_phone === false &&
+      (data.fraud_score_phone || 0) == 0 &&
+      data.valid_phone === false &&
       data.active_phone === false;
+    // // Determine if the lead is bad quality
+    // const badQuality =
+    //   data.leaked_phone === true ||
+    //   data.risky_phone === true ||
+    //   (data.fraud_score_phone || 0) > 0 ||
+    //   data.valid_phone === false ||
+    //   data.active_phone === false;
 
     // Log lead and IPQS response to Firestore
     const logEntry = {
@@ -98,13 +105,15 @@ app.post("/validate-phone", async (req, res) => {
 
     // Send back validation result
     return res.json({
-      success: !badQuality,
+      success: goodQuality,
       valid_phone: data.valid_phone,
       test: data,
     });
   } catch (error) {
     console.error("Validation error:", error);
-    return res.status(500).json({ error: "Internal server error." });
+    return res.json({
+      success: false,
+    });
   }
 });
 
