@@ -82,11 +82,10 @@ app.post("/validate-phone", async (req, res) => {
 
     // Determine if the lead is good quality
     const goodQuality =
-      data.leaked_phone === false &&
       data.risky_phone === false &&
       (data.fraud_score_phone || 0) == 0 &&
-      data.valid_phone === false &&
-      data.active_phone === false;
+      data.valid_phone === true &&
+      data.active_phone === true;
     // // Determine if the lead is bad quality
     // const badQuality =
     //   data.leaked_phone === true ||
